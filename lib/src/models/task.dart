@@ -18,7 +18,7 @@ class Task extends Equatable {
   /// The [Project] this [Task] is linked to.
   ///
   /// Can be [null]. Indicates that the [Task] is not linked to a [Project].
-  final String projectId;
+  final String? projectId;
 
   /// The [TaskState] of this [Task].
   ///
@@ -31,10 +31,10 @@ class Task extends Equatable {
   ///
   /// [id] must be a unique identifier.
   /// [state] is set to [inProgress] by default.
-  Task(
+  const Task(
     this.id, {
-    this.name,
-    this.duration,
+    required this.name,
+    this.duration = Duration.zero,
     this.projectId,
     this.state = TaskState.inProgress,
   });
@@ -45,7 +45,7 @@ class Task extends Equatable {
       id,
       name,
       duration,
-      projectId,
+      projectId ?? '',
       state,
     ];
   }
