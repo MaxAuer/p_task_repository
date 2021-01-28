@@ -12,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   equatable: ^2.0.0-nullsafety.1
+  path_provider: ^1.6.27
+  sqflite: ^2.0.0-nullsafety.2
 
 dev_dependencies:
   flutter_test:
