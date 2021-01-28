@@ -38,6 +38,6 @@ abstract class TaskRepository {
   Future<bool> updateTaskWith(
     String userId,
     String taskId, {
-    Task task,
+    required Task task,
   });
 }
