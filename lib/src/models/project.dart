@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 /// A [Project] is a collection for different [Task]`s.
 class Project extends Equatable {
   /// This is a unique [id].
-  final String id;
+  final String? id;
 
   /// The [name] of the Project should not be used more than once
   /// so the [User] can differentiate between two [Project]`s.
@@ -14,5 +14,8 @@ class Project extends Equatable {
   Project(this.id, this.name);
 
   @override
-  List<Object> get props => [id, name];
+  List<Object> get props => [
+        id ?? '',
+        name,
+      ];
 }
