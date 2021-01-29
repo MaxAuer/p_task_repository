@@ -90,4 +90,25 @@ class SqlTask extends Equatable {
       _stateTag: 'INTEGER',
     };
   }
+
+  /// Convert a [SqlTask] to a [Task].
+  Task toTask() {
+    return Task(
+      id == null ? '' : id.toString(),
+      name: name,
+      duration: duration,
+      projectId: projectId == null ? '' : projectId.toString(),
+      state: state,
+    );
+  }
+
+  /// Convert a [Task] to a [SqlTask].
+  static SqlTask fromTask(Task task) {
+    return SqlTask(
+        id: task.id == null ? null : int.tryParse(task.id!),
+        name: task.name,
+        duration: task.duration,
+        projectId: int.tryParse(task.projectId ?? '') ?? null,
+        state: task.state);
+  }
 }
