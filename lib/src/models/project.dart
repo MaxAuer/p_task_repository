@@ -11,11 +11,22 @@ class Project extends Equatable {
 
   /// An instance of a [Project] requires to have an unique [id] and a [name]
   /// associated with it.
-  Project(this.id, this.name);
+  const Project(this.id, this.name);
 
   @override
   List<Object> get props => [
         id ?? '',
         name,
       ];
+
+  /// Copy [Project] with the specified parameters.
+  Project copyWith({
+    String? id,
+    String? name,
+  }) {
+    return Project(
+      id ?? this.id,
+      name ?? this.name,
+    );
+  }
 }
