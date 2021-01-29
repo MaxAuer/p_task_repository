@@ -40,4 +40,29 @@ abstract class TaskRepository {
     String taskId, {
     required Task task,
   });
+
+  /// Add a new [Task] to the [Repository].
+  ///
+  /// If the [id] of the [Task] is empty the backend should supply an [id] on
+  /// the returned [Task].
+  ///
+  /// Should throw a [TaskAllreadyExists] Exception when the given [id] already
+  /// exists in the backend. Use [updateTaskWith] in this case.
+  ///
+  /// Should throw a [ProjectOfTaskDoesNotExist] Exception when the given
+  /// [projectId] could not be found in the backend.
+  ///
+  /// Should return the created [Task] with the values from the backend.
+  Future<Task> addTask(Task task);
+
+  /// Add a new [Project] to the [Repository].
+  ///
+  /// If the [id] of the [Project] is empty the backend should supply an [id] on
+  /// the returned [Project].
+  ///
+  /// Should throw a [ProjectCouldNotBeAdded] Exception when the [Project] could
+  /// not be added to the backend.
+  ///
+  /// Should return the created [Project] wit the values from the backend.
+  Future<Project> addProject(Project project);
 }
