@@ -3,6 +3,10 @@ class ExceptionMessages {
   /// [ProjectCouldNotBeAdded] for [name] is empty.
   static const String errorMessageProjectCouldNotBeAddedNameEmpty =
       'Could not add Project. The supplied \'name\' was empty.';
+
+  /// [ProjectCouldNotBeAdded] because the [id] already exists.
+  static const String errorMessageProjectCouldNotBeAddedIdDuplicate =
+      'Could not add Project. The supplied \'id\' already exists.';
 }
 
 /// This [Exception] will be thrown by the repository when the update of a
