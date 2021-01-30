@@ -45,8 +45,7 @@ abstract class TaskRepository {
   ///
   /// Should throw a [CouldNotUpdateTask] when something goes wrong.
   Future<bool> updateTaskWith(
-    String userId,
-    String taskId, {
+    String userId, {
     required Task task,
   });
 

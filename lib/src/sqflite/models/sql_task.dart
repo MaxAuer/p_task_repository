@@ -8,7 +8,9 @@ class SqlTask extends Equatable {
   static const String _nameTag = 'name';
   static const String _durationTag = 'duration';
   static const String _projectTag = 'projectId';
-  static const String _stateTag = 'state';
+
+  /// The tag used within the [sql] database for the state.
+  static const String stateTag = 'state';
 
   /// Unique ID for the [SqlTask]
   ///
@@ -59,7 +61,7 @@ class SqlTask extends Equatable {
       _nameTag: name,
       _durationTag: duration.inSeconds,
       _projectTag: projectId ?? -1,
-      _stateTag: state.index,
+      stateTag: state.index,
     };
 
     if (id != null) {
@@ -76,7 +78,7 @@ class SqlTask extends Equatable {
       name: map[_nameTag],
       duration: Duration(seconds: map[_durationTag]),
       projectId: map[_projectTag],
-      state: TaskState.values[map[_stateTag]],
+      state: TaskState.values[map[stateTag]],
     );
   }
 
@@ -87,7 +89,7 @@ class SqlTask extends Equatable {
       _nameTag: 'TEXT',
       _durationTag: 'INTEGER',
       _projectTag: 'INTEGER',
-      _stateTag: 'INTEGER',
+      stateTag: 'INTEGER',
     };
   }
 

@@ -202,5 +202,50 @@ void main() {
         expect(tasks[1].name, 'heho');
       });
     });
+
+    group('fetchTasksCompleted', () {
+      late Task defaultTask;
+
+      setUp(() {
+        defaultTask = Task.empty(name: 'default', state: TaskState.finished);
+      });
+
+      test('empty repository return empty list', () async {
+        expect(await repository.fetchTasksCompleted(userId), isEmpty);
+      });
+
+      test('database with completed tasks returns completed tasks', () async {
+        await repository.addTask(defaultTask);
+
+        var tasks = await repository.fetchTasksCompleted(userId);
+
+        expect(tasks.length, 1);
+        expect(
+          tasks.every((element) => element.state == TaskState.finished),
+          isTrue,
+        );
+
+        await repository.addTask(Task.empty(name: 'new task'));
+
+        tasks = await repository.fetchTasksCompleted(userId);
+
+        expect(tasks.length, 1);
+        expect(
+          tasks.every((element) => element.state == TaskState.finished),
+          isTrue,
+        );
+
+        await repository
+            .addTask(Task.empty(name: 'finished', state: TaskState.finished));
+
+        tasks = await repository.fetchTasksCompleted(userId);
+
+        expect(tasks.length, 2);
+        expect(
+          tasks.every((element) => element.state == TaskState.finished),
+          isTrue,
+        );
+      });
+    });
   });
 }

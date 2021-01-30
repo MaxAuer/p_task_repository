@@ -113,9 +113,26 @@ class SqfliteTaskRepository implements TaskRepository {
   }
 
   @override
-  Future<List<Task>> fetchTasksCompleted(String userId) {
-    // TODO: implement fetchTasksCompleted
-    throw UnimplementedError();
+  Future<List<Task>> fetchTasksCompleted(String userId) async {
+    if (!await _database.tableExists(_tasks)) {
+      return <Task>[];
+    }
+
+    try {
+      List<Map<String, dynamic>> tasks = await _database.query(
+        _tasks,
+        where: '${SqlTask.stateTag} = ?',
+        whereArgs: [TaskState.finished.index],
+      );
+
+      if (tasks.isNotEmpty) {
+        return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
+      } else {
+        return <Task>[];
+      }
+    } on Exception {
+      throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
+    }
   }
 
   @override
@@ -132,8 +149,7 @@ class SqfliteTaskRepository implements TaskRepository {
   }
 
   @override
-  Future<bool> updateTaskWith(String userId, String taskId,
-      {required Task task}) {
+  Future<bool> updateTaskWith(String userId, {required Task task}) {
     // TODO: implement updateTaskWith
     throw UnimplementedError();
   }
