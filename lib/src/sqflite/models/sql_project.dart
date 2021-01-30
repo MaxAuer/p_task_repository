@@ -58,8 +58,8 @@ class SqlProject extends Equatable {
   /// Convert a [SqlProject] to a [Project].
   Project toProject() {
     return Project(
-      id == null ? '' : id.toString(),
-      name,
+      id: id == null ? '' : id.toString(),
+      name: name,
     );
   }
 

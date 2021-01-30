@@ -11,7 +11,7 @@ class Project extends Equatable {
 
   /// An instance of a [Project] requires to have an unique [id] and a [name]
   /// associated with it.
-  const Project(this.id, this.name);
+  const Project({this.id, required this.name});
 
   @override
   List<Object> get props => [
@@ -25,8 +25,8 @@ class Project extends Equatable {
     String? name,
   }) {
     return Project(
-      id ?? this.id,
-      name ?? this.name,
+      id: id ?? this.id,
+      name: name ?? this.name,
     );
   }
 }
