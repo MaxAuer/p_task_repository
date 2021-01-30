@@ -111,17 +111,21 @@ void main() {
       });
 
       test('project can be fetched from the database', () async {
+        // created with id 1
         var project = Project(name: 'project');
         await repository.addProject(project);
 
+        // specific id supplied
         var projectTwo = Project(id: '100', name: 'hello project');
         await repository.addProject(projectTwo);
 
+        // get project with id 1
         var fetchedProject = await repository.fetchProject(userId, '1');
 
         expect(fetchedProject, isNotNull);
         expect(fetchedProject!.name, project.name);
 
+        // get project with supplied id
         fetchedProject = await repository.fetchProject(userId, '100');
 
         expect(fetchedProject, isNotNull);
