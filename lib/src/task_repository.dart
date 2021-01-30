@@ -24,6 +24,15 @@ abstract class TaskRepository {
   /// Should throw a [CouldNotFetchProjects] when something goes wrong.
   Future<List<Project>> fetchProjects(String userId);
 
+  /// Get the [Project] with the [projectId] for the [User].
+  ///
+  /// Can return null to indicate that the [Project] did not exist in the
+  /// backend.
+  ///
+  /// Should throw a [CouldNotFetchProject] when the [Project] could not be
+  /// fetched.
+  Future<Project?> fetchProject(String userId, String projectId);
+
   /// Get all [Task]`s that are currently [inProgress].
   ///
   /// Should throw a [CouldNotFetchTasks] when something goes wrong.

@@ -67,4 +67,21 @@ class Task extends Equatable {
       state,
     ];
   }
+
+  /// Copy [Task] with the specified parameters.
+  Task copyWith({
+    String? id,
+    String? name,
+    Duration? duration,
+    String? projectId,
+    TaskState? state,
+  }) {
+    return Task(
+      id ?? this.id,
+      name: name ?? this.name,
+      duration: duration ?? this.duration,
+      projectId: projectId ?? this.projectId,
+      state: state ?? this.state,
+    );
+  }
 }

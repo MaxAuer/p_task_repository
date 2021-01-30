@@ -37,6 +37,13 @@ class CouldNotFetchProjects extends MessageException {
   CouldNotFetchProjects(this.userId, String message) : super(message);
 }
 
+/// This [Exception] will be thrown by the repository when the [Project] could
+/// not be fetched.
+class CouldNotFetchProject extends MessageException {
+  /// This [Exception] is thrown when the [Project] could not be fetched.
+  CouldNotFetchProject(String message) : super(message);
+}
+
 /// This [Exception] will be thrown by the repository when [Task]`s could
 /// not be fetched for a [User].
 class CouldNotFetchTasks extends MessageException {
