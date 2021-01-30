@@ -1,12 +1,16 @@
 /// Collection of ErrorMessages to reuse them in different implementations
 class ExceptionMessages {
   /// [ProjectCouldNotBeAdded] for [name] is empty.
-  static const String errorMessageProjectCouldNotBeAddedNameEmpty =
+  static const String projectCouldNotBeAddedNameEmpty =
       'Could not add Project. The supplied \'name\' was empty.';
 
   /// [ProjectCouldNotBeAdded] because the [id] already exists.
-  static const String errorMessageProjectCouldNotBeAddedIdDuplicate =
+  static const String projectCouldNotBeAddedIdDuplicate =
       'Could not add Project. The supplied \'id\' already exists.';
+
+  /// [CouldNotFetchProjects] caused by an error in the backend.
+  static const String couldNotFetchProjects =
+      'Could not fetch Projects. Something went wrong in the sqllibrary.';
 }
 
 /// This [Exception] will be thrown by the repository when the update of a
@@ -54,6 +58,9 @@ enum ProjectErrorReason {
 
   /// An empty [name] was supplied.
   nameEmpty,
+
+  /// Sql Error
+  sqlError,
 }
 
 /// This [Exception] will e thrown by the repository when it could not add

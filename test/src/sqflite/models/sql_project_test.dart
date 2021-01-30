@@ -28,8 +28,8 @@ void main() {
     test('converstion from and to project does work', () {
       // test without id
       var project = Project(
-        null,
-        'name',
+        id: null,
+        name: 'name',
       );
 
       var sqlProject = SqlProject.fromProject(project);
@@ -38,7 +38,7 @@ void main() {
       expect(project, projectConverted);
 
       // test with set id
-      project = Project('3', 'name');
+      project = Project(id: '3', name: 'name');
       sqlProject = SqlProject.fromProject(project);
       projectConverted = sqlProject.toProject();
 
