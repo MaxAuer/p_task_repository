@@ -59,9 +59,7 @@ void main() {
 
     group('fetchProjects', () {
       test('empty database returns empty list', () async {
-        var projects = await repository.fetchProjects(userId);
-
-        expect(projects.isEmpty, true);
+        expect(await repository.fetchProjects(userId), isEmpty);
       });
 
       test('database with project returns projects', () async {
@@ -89,8 +87,7 @@ void main() {
 
     group('fetchProject', () {
       test('empty database returns null', () async {
-        var project = await repository.fetchProject(userId, '1');
-        expect(project, null);
+        expect(await repository.fetchProject(userId, '1'), isNull);
       });
 
       test('invalid projectId throws exception', () async {
@@ -171,6 +168,38 @@ void main() {
         expect(repositoryTask.duration, Duration(seconds: 101));
         expect(repositoryTask.state, TaskState.finished);
         expect(repositoryTask.projectId, '1');
+      });
+    });
+
+    group('fetchTasks', () {
+      late Task defaultTask;
+
+      setUp(() {
+        defaultTask = Task.empty(name: 'default');
+      });
+
+      test('empty repository returns empty list', () async {
+        expect(await repository.fetchTasks(userId), isEmpty);
+      });
+
+      test('database with tasks returns tasks', () async {
+        await repository.addTask(defaultTask);
+
+        var tasks = await repository.fetchTasks(userId);
+
+        expect(tasks, isNotEmpty);
+        expect(tasks.length, 1);
+        expect(tasks[0].id, '1');
+        expect(tasks[0].name, defaultTask.name);
+
+        await repository.addTask(Task('100', name: 'heho'));
+
+        tasks = await repository.fetchTasks(userId);
+
+        expect(tasks, isNotEmpty);
+        expect(tasks.length, 2);
+        expect(tasks[1].id, '100');
+        expect(tasks[1].name, 'heho');
       });
     });
   });

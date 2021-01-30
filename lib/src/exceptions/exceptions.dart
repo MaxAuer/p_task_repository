@@ -12,6 +12,10 @@ class ExceptionMessages {
   static const String couldNotFetchProjects =
       'Could not fetch Projects. Something went wrong in the sqllibrary.';
 
+  /// [CouldNotFetchTaks] caused by an error in the backend.
+  static const String couldNotFetchTasks =
+      'Could not fetch Tasks. Something went wrong in the sqllibrary.';
+
   /// Used when the backend throws some error and the repository could
   /// not catch it properly.
   static const String backendError =

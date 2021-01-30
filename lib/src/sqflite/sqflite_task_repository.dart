@@ -86,13 +86,30 @@ class SqfliteTaskRepository implements TaskRepository {
     }
   }
 
+  /// Fetch all [Task]`s.
+  ///
+  /// If the database is empty it returns an empty list.
+  ///
+  /// Throws a [CouldNotFetchTasks] exception if something goes wrong.
   @override
   Future<List<Task>> fetchTasks(String userId) async {
     if (!await _database.tableExists(_tasks)) {
       return <Task>[];
     }
-    // TODO: implement fetchTasks
-    throw UnimplementedError();
+
+    try {
+      var tasks = <Task>[];
+
+      List<Map<String, dynamic>> taskRecords = await _database.query(_tasks);
+
+      for (var record in taskRecords) {
+        tasks.add(SqlTask.fromMap(record).toTask());
+      }
+
+      return tasks;
+    } on Exception {
+      throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchProjects);
+    }
   }
 
   @override
