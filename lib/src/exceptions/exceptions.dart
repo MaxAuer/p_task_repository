@@ -11,6 +11,19 @@ class ExceptionMessages {
   /// [CouldNotFetchProjects] caused by an error in the backend.
   static const String couldNotFetchProjects =
       'Could not fetch Projects. Something went wrong in the sqllibrary.';
+
+  /// Used when the backend throws some error and the repository could
+  /// not catch it properly.
+  static const String backendError =
+      'Could not complete action. Backend encountered some error.';
+
+  /// [CouldNotFetchProject] caused by an string id which isnt parsable to int.
+  static const String couldNotFetchProjectIdNoInt =
+      'Could not fetch Project. The given Id could not be parsed to int.';
+
+  /// [TaskAllreadyExists] uses this message when the task already existed.
+  static const String taskCouldNotBeAdded =
+      'Could not add Task. The given Id was already used. Use updateTaskWith.';
 }
 
 /// This [Exception] will be thrown by the repository when the update of a
@@ -96,6 +109,14 @@ class TaskAllreadyExists extends MessageException {
   /// This [Exception] will be thrown by the repository when the [id] of the
   /// [Task] already exists.
   const TaskAllreadyExists(String message) : super(message);
+}
+
+/// This [Exception] will be thrown by the repository when the backend
+/// encountered some issue while adding the [Task].
+class CouldNotAddTask extends MessageException {
+  /// This [Exception] will be thrown when the backend encounters an error
+  /// while adding the [Task].
+  CouldNotAddTask(String message) : super(message);
 }
 
 /// Base Class for [Exception]`s that include an error message

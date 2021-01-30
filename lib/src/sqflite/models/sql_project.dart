@@ -4,7 +4,8 @@ import '../../../p_task_repository.dart';
 
 /// [SqlProject] represents a [Project] for the [SqlBackend].
 class SqlProject extends Equatable {
-  static const String _idTag = 'id';
+  /// Tag of the [id] within the [sql] backend.
+  static const String idTag = 'id';
   static const String _nameTag = 'name';
 
   /// This is a unique [id].
@@ -33,7 +34,7 @@ class SqlProject extends Equatable {
     };
 
     if (id != null) {
-      map[_idTag] = id;
+      map[idTag] = id;
     }
 
     return map;
@@ -42,7 +43,7 @@ class SqlProject extends Equatable {
   /// Get a [SqlProject] from the values from the backend.
   static SqlProject fromMap(Map<String, dynamic> map) {
     return SqlProject(
-      id: map[_idTag],
+      id: map[idTag],
       name: map[_nameTag],
     );
   }
@@ -50,7 +51,7 @@ class SqlProject extends Equatable {
   /// Describes the [colums] of the [SqlProject].
   static Map<String, String> tableConfig() {
     return <String, String>{
-      _idTag: 'INTEGER PRIMARY KEY',
+      idTag: 'INTEGER PRIMARY KEY',
       _nameTag: 'TEXT',
     };
   }

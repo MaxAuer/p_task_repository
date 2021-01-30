@@ -86,5 +86,88 @@ void main() {
         expect(projects[1].name, projectSecondName);
       });
     });
+
+    group('fetchProject', () {
+      test('empty database returns null', () async {
+        var project = await repository.fetchProject(userId, '1');
+        expect(project, null);
+      });
+
+      test('invalid projectId throws exception', () async {
+        var project = Project(name: 'hello world');
+        await repository.addProject(project);
+
+        expect(
+          repository.fetchProject(userId, 'asdf'),
+          throwsA(isA<CouldNotFetchProject>()),
+        );
+      });
+
+      test('valid non existent projectId throws exception', () async {
+        var project = Project(name: 'hello world');
+        await repository.addProject(project);
+
+        expect(await repository.fetchProject(userId, '2'), isNull);
+      });
+
+      test('project can be fetched from the database', () async {
+        var project = Project(name: 'project');
+        await repository.addProject(project);
+
+        var projectTwo = Project(id: '100', name: 'hello project');
+        await repository.addProject(projectTwo);
+
+        var fetchedProject = await repository.fetchProject(userId, '1');
+
+        expect(fetchedProject, isNotNull);
+        expect(fetchedProject!.name, project.name);
+
+        fetchedProject = await repository.fetchProject(userId, '100');
+
+        expect(fetchedProject, isNotNull);
+        expect(fetchedProject?.name, projectTwo.name);
+        expect(fetchedProject?.id, projectTwo.id);
+      });
+    });
+
+    group('addTask', () {
+      test('adding invalid task throws exception', () async {
+        var task = Task.empty(name: 'name');
+        var repositoryTask = await repository.addTask(task);
+        // add the same task with the same id again
+        expect(repository.addTask(repositoryTask),
+            throwsA(isA<CouldNotAddTask>()));
+      });
+
+      test('task can be added to the database', () async {
+        // add default task
+        var task = Task.empty(name: 'new Task');
+
+        var repositoryTask = await repository.addTask(task);
+
+        expect(repositoryTask.name, 'new Task');
+        expect(repositoryTask.id, '1');
+        expect(repositoryTask.duration, Duration.zero);
+        expect(repositoryTask.state, TaskState.inProgress);
+        expect(repositoryTask.projectId, null);
+
+        // add task with values
+        task = Task(
+          null,
+          name: 'another Task',
+          duration: Duration(seconds: 101),
+          state: TaskState.finished,
+          projectId: '1',
+        );
+
+        repositoryTask = await repository.addTask(task);
+
+        expect(repositoryTask.id, '2');
+        expect(repositoryTask.name, 'another Task');
+        expect(repositoryTask.duration, Duration(seconds: 101));
+        expect(repositoryTask.state, TaskState.finished);
+        expect(repositoryTask.projectId, '1');
+      });
+    });
   });
 }

@@ -50,6 +50,42 @@ class SqfliteTaskRepository implements TaskRepository {
     }
   }
 
+  /// Fetch a single [Product] from the backend.
+  ///
+  /// If the [Project] can not be found in the backend it will return [null].
+  ///
+  /// Supply the [projectId] as an integer as the backend saves [id]`s as
+  /// [int]s. Throws a [CouldNotFetchProject] Exception otherwise.
+  @override
+  Future<Project?> fetchProject(String userId, String projectId) async {
+    if (!await _database.tableExists(_projects)) {
+      return null;
+    }
+
+    try {
+      var id = int.tryParse(projectId);
+
+      if (id == null) {
+        throw CouldNotFetchProject(
+            ExceptionMessages.couldNotFetchProjectIdNoInt);
+      }
+
+      List<Map<String, dynamic>> projects = await _database.query(
+        _projects,
+        where: '${SqlProject.idTag} = ?',
+        whereArgs: [id],
+      );
+
+      if (projects.isNotEmpty) {
+        return SqlProject.fromMap(projects[0]).toProject();
+      } else {
+        return null;
+      }
+    } on Exception {
+      throw CouldNotFetchProject(ExceptionMessages.backendError);
+    }
+  }
+
   @override
   Future<List<Task>> fetchTasks(String userId) async {
     if (!await _database.tableExists(_tasks)) {
@@ -130,9 +166,34 @@ class SqfliteTaskRepository implements TaskRepository {
     }
   }
 
+  /// Add a [Task] to the backend.
+  ///
+  /// The [id] of the [Task] should be [null]. Only set the [id] when you
+  /// know that it will be unique. Also it must be an [int].
+  /// If the [id] is not [null] and an entry with the given [id] already
+  /// exists it will throw an [TaskAlreadyExists] exception.
+  ///
+  /// It is not validated if the [projectId] of the [Task] exists in the
+  /// backend.
   @override
-  Future<Task> addTask(Task task) {
-    // TODO: implement addTask
-    throw UnimplementedError();
+  Future<Task> addTask(Task task) async {
+    if (!await _database.tableExists(_tasks)) {
+      await _database.createTable(_tasks, SqlTask.tableConfig());
+    }
+
+    try {
+      var id = await _database.insert(_tasks, SqlTask.fromTask(task).toMap());
+      if (id == 0) {
+        throw TaskAllreadyExists(ExceptionMessages.taskCouldNotBeAdded);
+      } else {
+        return task.copyWith(id: id.toString());
+      }
+    } on Exception catch (e) {
+      if (e is MessageException) {
+        rethrow;
+      } else {
+        throw CouldNotAddTask(ExceptionMessages.backendError);
+      }
+    }
   }
 }
