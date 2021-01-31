@@ -25,6 +25,10 @@ class ExceptionMessages {
   static const String couldNotFetchProjectIdNoInt =
       'Could not fetch Project. The given Id could not be parsed to int.';
 
+  /// [CouldNotUpdateTask] caused by an string id which isnt parsable to int.
+  static const String couldNotUpdateTaskIdNotInt =
+      'Could not update Task. The Task`s Id could not be parsed to int.';
+
   /// [TaskAllreadyExists] uses this message when the task already existed.
   static const String taskCouldNotBeAdded =
       'Could not add Task. The given Id was already used. Use updateTaskWith.';

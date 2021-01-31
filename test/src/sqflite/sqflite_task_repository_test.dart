@@ -309,5 +309,42 @@ void main() {
         );
       });
     });
+
+    group('updateTaskWith', () {
+      test('task without id returns false', () async {
+        expect(
+          await repository.updateTaskWith(userId, task: defaultTask),
+          isFalse,
+        );
+      });
+
+      test('empty database returns false', () async {
+        expect(
+          await repository.updateTaskWith(
+            userId,
+            task: defaultTask.copyWith(id: '1'),
+          ),
+          isFalse,
+        );
+      });
+
+      test('updating existing tasks with values updates the values', () async {
+        var task = await repository.addTask(defaultTask);
+
+        task = task.copyWith(
+          duration: Duration(seconds: 100),
+          name: 'another name',
+          projectId: '10',
+          state: TaskState.finished,
+        );
+
+        expect(await repository.updateTaskWith(userId, task: task), isTrue);
+
+        var tasks = await repository.fetchTasks(userId);
+
+        expect(tasks.length, 1);
+        expect(tasks.first, task);
+      });
+    });
   });
 }

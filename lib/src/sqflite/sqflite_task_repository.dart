@@ -206,10 +206,45 @@ class SqfliteTaskRepository implements TaskRepository {
     }
   }
 
+  /// Update [Task] with the given [Task].
+  ///
+  /// If the [id] of the [Task] is [null], [empty] it will return [false].
+  ///
+  /// If the [id] can not be parsed to [int] it will throw a
+  /// [CouldNotUpdateTask] exception.
   @override
-  Future<bool> updateTaskWith(String userId, {required Task task}) {
-    // TODO: implement updateTaskWith
-    throw UnimplementedError();
+  Future<bool> updateTaskWith(String userId, {required Task task}) async {
+    if (task.id == null || task.id!.isEmpty) {
+      return false;
+    }
+
+    if (!await _database.tableExists(_tasks)) {
+      return false;
+    }
+
+    try {
+      var id = int.tryParse(task.id!);
+      if (id == null) {
+        throw CouldNotUpdateTask(
+          task.id!,
+          userId,
+          ExceptionMessages.couldNotUpdateTaskIdNotInt,
+        );
+      }
+
+      var updated = await _database.update(
+          _tasks, SqlTask.fromTask(task).toMap(),
+          where: '${SqlTask.idTag} = ?', whereArgs: [id]);
+
+      if (updated > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } on Exception {
+      throw CouldNotUpdateTask(
+          task.id!, userId, ExceptionMessages.backendError);
+    }
   }
 
   /// Add a [Project] to the [sqflite] backend.

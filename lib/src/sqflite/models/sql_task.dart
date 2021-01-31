@@ -4,7 +4,8 @@ import '../../../p_task_repository.dart';
 
 /// [SqlTask] represents a [Task] for the [SqlBackend].
 class SqlTask extends Equatable {
-  static const String _idTag = 'id';
+  /// The tag used within the [sql] database for the state.
+  static const String idTag = 'id';
   static const String _nameTag = 'name';
   static const String _durationTag = 'duration';
 
@@ -67,7 +68,7 @@ class SqlTask extends Equatable {
     };
 
     if (id != null) {
-      map[_idTag] = id;
+      map[idTag] = id;
     }
 
     return map;
@@ -76,7 +77,7 @@ class SqlTask extends Equatable {
   /// Get a [SqlTask] from the values from the backend.
   static SqlTask fromMap(Map<String, dynamic> map) {
     return SqlTask(
-      id: map[_idTag],
+      id: map[idTag],
       name: map[_nameTag],
       duration: Duration(seconds: map[_durationTag]),
       projectId: map[projectTag],
@@ -87,7 +88,7 @@ class SqlTask extends Equatable {
   /// Describes the [colums] of the [SqlTask].
   static Map<String, String> tableConfig() {
     return <String, String>{
-      _idTag: 'INTEGER PRIMARY KEY',
+      idTag: 'INTEGER PRIMARY KEY',
       _nameTag: 'TEXT',
       _durationTag: 'INTEGER',
       projectTag: 'INTEGER',
