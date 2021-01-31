@@ -13,10 +13,16 @@ void main() {
 
   sql.sqfliteFfiInit();
 
+  late Task defaultTask;
+  late Project defaultProject;
+
   group('SqfliteTaskRepository', () {
     setUp(() async {
       database = await sql.databaseFactoryFfi.openDatabase(pathToDatabase);
       repository = SqfliteTaskRepository(database: database);
+
+      defaultTask = Task.empty(name: 'default');
+      defaultProject = Project(name: 'default');
     });
 
     tearDown(() async {
@@ -172,12 +178,6 @@ void main() {
     });
 
     group('fetchTasks', () {
-      late Task defaultTask;
-
-      setUp(() {
-        defaultTask = Task.empty(name: 'default');
-      });
-
       test('empty repository returns empty list', () async {
         expect(await repository.fetchTasks(userId), isEmpty);
       });
@@ -204,18 +204,14 @@ void main() {
     });
 
     group('fetchTasksCompleted', () {
-      late Task defaultTask;
-
-      setUp(() {
-        defaultTask = Task.empty(name: 'default', state: TaskState.finished);
-      });
-
       test('empty repository return empty list', () async {
         expect(await repository.fetchTasksCompleted(userId), isEmpty);
       });
 
       test('database with completed tasks returns completed tasks', () async {
-        await repository.addTask(defaultTask);
+        await repository.addTask(
+          defaultTask.copyWith(state: TaskState.finished),
+        );
 
         var tasks = await repository.fetchTasksCompleted(userId);
 
@@ -243,6 +239,43 @@ void main() {
         expect(tasks.length, 2);
         expect(
           tasks.every((element) => element.state == TaskState.finished),
+          isTrue,
+        );
+      });
+    });
+
+    group('fetchTasksCompletedForProject', () {
+      test('empty database returns empty list', () async {
+        expect(await repository.fetchTasksCompletedForProject(userId, '1'),
+            isEmpty);
+      });
+
+      test('database with tasks for project returns tasks', () async {
+        await repository.addProject(defaultProject);
+        var task = defaultTask.copyWith(projectId: '1');
+        await repository.addTask(task);
+
+        var tasks = await repository.fetchTasksCompletedForProject(userId, '1');
+
+        expect(tasks.length, 1);
+
+        await repository.addTask(Task.empty(name: 'new Task', projectId: '1'));
+        await repository
+            .addTask(Task.empty(name: 'another brick', projectId: '2'));
+
+        tasks = await repository.fetchTasksCompletedForProject(userId, '1');
+
+        expect(tasks.length, 2);
+        expect(
+          tasks.every((element) => element.projectId == '1'),
+          isTrue,
+        );
+
+        tasks = await repository.fetchTasksCompletedForProject(userId, '2');
+
+        expect(tasks.length, 1);
+        expect(
+          tasks.every((element) => element.projectId == '2'),
           isTrue,
         );
       });

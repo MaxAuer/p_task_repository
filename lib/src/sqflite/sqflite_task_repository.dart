@@ -135,11 +135,43 @@ class SqfliteTaskRepository implements TaskRepository {
     }
   }
 
+  /// Fetch all [Task]`s for the given [Project].
+  ///
+  /// It is not checked if the [projectId] exists in the backend.
+  /// Finding no occurences returns an empty list.
+  ///
+  /// Throws a [CouldNotFetchTasks] exception when the [projectId] can
+  /// not be parsed to [int].
   @override
   Future<List<Task>> fetchTasksCompletedForProject(
-      String userId, String projectId) {
-    // TODO: implement fetchTasksCompletedForProject
-    throw UnimplementedError();
+      String userId, String projectId) async {
+    if (!await _database.tableExists(_tasks) ||
+        !await _database.tableExists(_projects)) {
+      return <Task>[];
+    }
+
+    try {
+      var parsedProjectId = int.tryParse(projectId);
+
+      if (parsedProjectId == null) {
+        throw CouldNotFetchTasks(
+            userId, ExceptionMessages.couldNotFetchProjectIdNoInt);
+      }
+
+      List<Map<String, dynamic>> tasks = await _database.query(
+        _tasks,
+        where: '${SqlTask.projectTag} = ?',
+        whereArgs: [parsedProjectId],
+      );
+
+      if (tasks.isNotEmpty) {
+        return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
+      } else {
+        return <Task>[];
+      }
+    } on Exception {
+      throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
+    }
   }
 
   @override

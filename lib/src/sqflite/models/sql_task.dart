@@ -7,7 +7,9 @@ class SqlTask extends Equatable {
   static const String _idTag = 'id';
   static const String _nameTag = 'name';
   static const String _durationTag = 'duration';
-  static const String _projectTag = 'projectId';
+
+  /// The tag used within the [sql] database for the state.
+  static const String projectTag = 'projectId';
 
   /// The tag used within the [sql] database for the state.
   static const String stateTag = 'state';
@@ -60,7 +62,7 @@ class SqlTask extends Equatable {
     var map = <String, dynamic>{
       _nameTag: name,
       _durationTag: duration.inSeconds,
-      _projectTag: projectId ?? -1,
+      projectTag: projectId ?? -1,
       stateTag: state.index,
     };
 
@@ -77,7 +79,7 @@ class SqlTask extends Equatable {
       id: map[_idTag],
       name: map[_nameTag],
       duration: Duration(seconds: map[_durationTag]),
-      projectId: map[_projectTag],
+      projectId: map[projectTag],
       state: TaskState.values[map[stateTag]],
     );
   }
@@ -88,7 +90,7 @@ class SqlTask extends Equatable {
       _idTag: 'INTEGER PRIMARY KEY',
       _nameTag: 'TEXT',
       _durationTag: 'INTEGER',
-      _projectTag: 'INTEGER',
+      projectTag: 'INTEGER',
       stateTag: 'INTEGER',
     };
   }
