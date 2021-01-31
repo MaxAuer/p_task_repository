@@ -1,22 +1,26 @@
 name: p_task_repository
-description: A new Flutter package project.
+description: Taks Repository for Point.
 version: 0.0.1
-author: null
+author: Maximilian Auer
 homepage: null
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0-0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  equatable: ^1.2.5
+  equatable: ^2.0.0-nullsafety.1
+  sqflite: ^2.0.0-nullsafety.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   effective_dart: ^1.3.0
+  sqflite_common_ffi: ^2.0.0-nullsafety.6
+  sqlite3: ^0.1.9-nullsafety.2
+  ffi: ^0.2.0-nullsafety.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
