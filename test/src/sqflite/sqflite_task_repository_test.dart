@@ -280,5 +280,34 @@ void main() {
         );
       });
     });
+
+    group('fetchTasksInProgress', () {
+      test('empty database returns empty list', () async {
+        expect(await repository.fetchTasksInProgress(userId), isEmpty);
+      });
+
+      test('database with inProgress tasks returns tasks', () async {
+        var taskOne = defaultTask.copyWith(state: TaskState.inProgress);
+        var taskTwo = defaultTask.copyWith(
+          state: TaskState.inProgress,
+          name: 'another Task',
+        );
+        var taskFinished = Task.empty(name: 'whop', state: TaskState.finished);
+        var taskCanceled = Task.empty(name: 'can', state: TaskState.cancelled);
+
+        await repository.addTask(taskOne);
+        await repository.addTask(taskTwo);
+        await repository.addTask(taskFinished);
+        await repository.addTask(taskCanceled);
+
+        var tasks = await repository.fetchTasksInProgress(userId);
+
+        expect(tasks.length, 2);
+        expect(
+          tasks.every((element) => element.state == TaskState.inProgress),
+          isTrue,
+        );
+      });
+    });
   });
 }

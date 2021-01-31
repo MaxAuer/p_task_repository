@@ -112,10 +112,15 @@ class SqfliteTaskRepository implements TaskRepository {
     }
   }
 
+  /// Fetch all completed [Task]`s.
+  ///
+  /// If the database is empty it returns an empty list.
+  ///
+  /// Throws a [CouldNotFetchTasks] exception if something goes wrong.
   @override
   Future<List<Task>> fetchTasksCompleted(String userId) async {
     if (!await _database.tableExists(_tasks)) {
-      return <Task>[];
+      return const <Task>[];
     }
 
     try {
@@ -128,7 +133,7 @@ class SqfliteTaskRepository implements TaskRepository {
       if (tasks.isNotEmpty) {
         return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
       } else {
-        return <Task>[];
+        return const <Task>[];
       }
     } on Exception {
       throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
@@ -145,9 +150,8 @@ class SqfliteTaskRepository implements TaskRepository {
   @override
   Future<List<Task>> fetchTasksCompletedForProject(
       String userId, String projectId) async {
-    if (!await _database.tableExists(_tasks) ||
-        !await _database.tableExists(_projects)) {
-      return <Task>[];
+    if (!await _database.tableExists(_tasks)) {
+      return const <Task>[];
     }
 
     try {
@@ -167,17 +171,39 @@ class SqfliteTaskRepository implements TaskRepository {
       if (tasks.isNotEmpty) {
         return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
       } else {
-        return <Task>[];
+        return const <Task>[];
       }
     } on Exception {
       throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
     }
   }
 
+  /// Fetch all [Task]`s that are [inProgress].
+  ///
+  /// If the database is empty it returns an empty list.
+  ///
+  /// Throws a [CouldNotFetchTasks] exception if something goes wrong.
   @override
-  Future<List<Task>> fetchTasksInProgress(String userId) {
-    // TODO: implement fetchTasksInProgress
-    throw UnimplementedError();
+  Future<List<Task>> fetchTasksInProgress(String userId) async {
+    if (!await _database.tableExists(_tasks)) {
+      return const <Task>[];
+    }
+
+    try {
+      List<Map<String, dynamic>> tasks = await _database.query(
+        _tasks,
+        where: '${SqlTask.stateTag} = ?',
+        whereArgs: [TaskState.inProgress.index],
+      );
+
+      if (tasks.isNotEmpty) {
+        return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
+      } else {
+        return const <Task>[];
+      }
+    } on Exception {
+      throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
+    }
   }
 
   @override
