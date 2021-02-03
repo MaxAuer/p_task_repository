@@ -29,21 +29,14 @@ class SqfliteTaskRepository implements TaskRepository {
   /// Throws a [CouldNotFetchProjects] Exception if anything goes wrong.
   @override
   Future<List<Project>> fetchProjects(String userId) async {
-    var projects = <Project>[];
-
-    if (!await _database.tableExists(_projects)) {
-      return projects;
+    if (!await _tableExists(_projects)) {
+      return const <Project>[];
     }
 
     try {
-      List<Map<String, dynamic>> projectRecords =
-          await _database.query(_projects);
+      List<Map<String, dynamic>> projects = await _database.query(_projects);
 
-      for (var record in projectRecords) {
-        projects.add(SqlProject.fromMap(record).toProject());
-      }
-
-      return projects;
+      return _mapProjects(projects);
     } on Exception {
       throw CouldNotFetchProjects(
           userId, ExceptionMessages.couldNotFetchProjects);
@@ -58,7 +51,7 @@ class SqfliteTaskRepository implements TaskRepository {
   /// [int]s. Throws a [CouldNotFetchProject] Exception otherwise.
   @override
   Future<Project?> fetchProject(String userId, String projectId) async {
-    if (!await _database.tableExists(_projects)) {
+    if (!await _tableExists(_projects)) {
       return null;
     }
 
@@ -93,20 +86,14 @@ class SqfliteTaskRepository implements TaskRepository {
   /// Throws a [CouldNotFetchTasks] exception if something goes wrong.
   @override
   Future<List<Task>> fetchTasks(String userId) async {
-    if (!await _database.tableExists(_tasks)) {
+    if (!await _tableExists(_tasks)) {
       return <Task>[];
     }
 
     try {
-      var tasks = <Task>[];
+      List<Map<String, dynamic>> tasks = await _database.query(_tasks);
 
-      List<Map<String, dynamic>> taskRecords = await _database.query(_tasks);
-
-      for (var record in taskRecords) {
-        tasks.add(SqlTask.fromMap(record).toTask());
-      }
-
-      return tasks;
+      return _mapTasks(tasks);
     } on Exception {
       throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchProjects);
     }
@@ -119,7 +106,7 @@ class SqfliteTaskRepository implements TaskRepository {
   /// Throws a [CouldNotFetchTasks] exception if something goes wrong.
   @override
   Future<List<Task>> fetchTasksCompleted(String userId) async {
-    if (!await _database.tableExists(_tasks)) {
+    if (!await _tableExists(_tasks)) {
       return const <Task>[];
     }
 
@@ -130,11 +117,7 @@ class SqfliteTaskRepository implements TaskRepository {
         whereArgs: [TaskState.finished.index],
       );
 
-      if (tasks.isNotEmpty) {
-        return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
-      } else {
-        return const <Task>[];
-      }
+      return _mapTasks(tasks);
     } on Exception {
       throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
     }
@@ -150,7 +133,7 @@ class SqfliteTaskRepository implements TaskRepository {
   @override
   Future<List<Task>> fetchTasksCompletedForProject(
       String userId, String projectId) async {
-    if (!await _database.tableExists(_tasks)) {
+    if (!await _tableExists(_tasks)) {
       return const <Task>[];
     }
 
@@ -168,11 +151,7 @@ class SqfliteTaskRepository implements TaskRepository {
         whereArgs: [parsedProjectId],
       );
 
-      if (tasks.isNotEmpty) {
-        return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
-      } else {
-        return const <Task>[];
-      }
+      return _mapTasks(tasks);
     } on Exception {
       throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
     }
@@ -185,7 +164,7 @@ class SqfliteTaskRepository implements TaskRepository {
   /// Throws a [CouldNotFetchTasks] exception if something goes wrong.
   @override
   Future<List<Task>> fetchTasksInProgress(String userId) async {
-    if (!await _database.tableExists(_tasks)) {
+    if (!await _tableExists(_tasks)) {
       return const <Task>[];
     }
 
@@ -196,11 +175,7 @@ class SqfliteTaskRepository implements TaskRepository {
         whereArgs: [TaskState.inProgress.index],
       );
 
-      if (tasks.isNotEmpty) {
-        return tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
-      } else {
-        return const <Task>[];
-      }
+      return _mapTasks(tasks);
     } on Exception {
       throw CouldNotFetchTasks(userId, ExceptionMessages.couldNotFetchTasks);
     }
@@ -218,7 +193,7 @@ class SqfliteTaskRepository implements TaskRepository {
       return false;
     }
 
-    if (!await _database.tableExists(_tasks)) {
+    if (!await _tableExists(_tasks)) {
       return false;
     }
 
@@ -266,7 +241,7 @@ class SqfliteTaskRepository implements TaskRepository {
   /// the [Project] coudl not be added to the backend.
   @override
   Future<Project> addProject(Project project) async {
-    if (!await _database.tableExists(_projects)) {
+    if (!await _tableExists(_projects)) {
       await _database.createTable(_projects, SqlProject.tableConfig());
     }
 
@@ -278,15 +253,12 @@ class SqfliteTaskRepository implements TaskRepository {
     }
 
     try {
-      var id = await _database.insert(
-          _projects, SqlProject.fromProject(project).toMap());
+      var id = await _addToTable(
+        _projects,
+        SqlProject.fromProject(project).toMap(),
+      );
 
-      if (id == 0) {
-        throw ProjectCouldNotBeAdded(ProjectErrorReason.idDuplicate,
-            ExceptionMessages.projectCouldNotBeAddedIdDuplicate);
-      } else {
-        return project.copyWith(id: id.toString());
-      }
+      return project.copyWith(id: id.toString());
     } on Exception catch (e) {
       throw ProjectCouldNotBeAdded(ProjectErrorReason.sqlError, e.toString());
     }
@@ -303,17 +275,14 @@ class SqfliteTaskRepository implements TaskRepository {
   /// backend.
   @override
   Future<Task> addTask(Task task) async {
-    if (!await _database.tableExists(_tasks)) {
+    if (!await _tableExists(_tasks)) {
       await _database.createTable(_tasks, SqlTask.tableConfig());
     }
 
     try {
-      var id = await _database.insert(_tasks, SqlTask.fromTask(task).toMap());
-      if (id == 0) {
-        throw TaskAllreadyExists(ExceptionMessages.taskCouldNotBeAdded);
-      } else {
-        return task.copyWith(id: id.toString());
-      }
+      var id = await _addToTable(_tasks, SqlTask.fromTask(task).toMap());
+
+      return task.copyWith(id: id.toString());
     } on Exception catch (e) {
       if (e is MessageException) {
         rethrow;
@@ -321,5 +290,43 @@ class SqfliteTaskRepository implements TaskRepository {
         throw CouldNotAddTask(ExceptionMessages.backendError);
       }
     }
+  }
+
+  /// Helper for adding data to a table and throwing errors
+  Future<int> _addToTable(String table, Map<String, dynamic> map) async {
+    try {
+      var id = await _database.insert(table, map);
+
+      if (id == 0) {
+        throw CouldNotAddElement(ExceptionMessages.idAlreadyUsed);
+      } else {
+        return id;
+      }
+    } on Exception {
+      throw CouldNotAddElement(ExceptionMessages.backendError);
+    }
+  }
+
+  /// Parse [SqlTask]`s to [Task]`s.
+  ///
+  /// Returns empty List when tasks is empty.
+  List<Task> _mapTasks(List<Map<String, dynamic>> tasks) {
+    return tasks.isEmpty
+        ? const <Task>[]
+        : tasks.map((e) => SqlTask.fromMap(e).toTask()).toList();
+  }
+
+  /// Parse [SqlProject]`s to [Project]`s.
+  ///
+  /// Returns empty List when tasks is empty.
+  List<Project> _mapProjects(List<Map<String, dynamic>> projects) {
+    return projects.isEmpty
+        ? const <Project>[]
+        : projects.map((e) => SqlProject.fromMap(e).toProject()).toList();
+  }
+
+  /// Check if the table exists in the sql backend.
+  Future<bool> _tableExists(String table) async {
+    return await _database.tableExists(table);
   }
 }

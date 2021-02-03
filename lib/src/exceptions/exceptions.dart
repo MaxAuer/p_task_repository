@@ -32,6 +32,10 @@ class ExceptionMessages {
   /// [TaskAllreadyExists] uses this message when the task already existed.
   static const String taskCouldNotBeAdded =
       'Could not add Task. The given Id was already used. Use updateTaskWith.';
+
+  /// The id was already used within the [SQL] table.
+  static const String idAlreadyUsed =
+      'Could not add Element. The given Id was already used.';
 }
 
 /// This [Exception] will be thrown by the repository when the update of a
@@ -125,6 +129,14 @@ class CouldNotAddTask extends MessageException {
   /// This [Exception] will be thrown when the backend encounters an error
   /// while adding the [Task].
   CouldNotAddTask(String message) : super(message);
+}
+
+/// This [Exception] will be thrown by the repository when the backend
+/// encountered some issue while adding the [Element].
+class CouldNotAddElement extends MessageException {
+  /// This [Exception] will be thrown when the backend encounters an error
+  /// while adding the [Element].
+  CouldNotAddElement(String message) : super(message);
 }
 
 /// Base Class for [Exception]`s that include an error message

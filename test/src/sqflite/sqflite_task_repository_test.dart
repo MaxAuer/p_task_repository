@@ -143,7 +143,7 @@ void main() {
         var repositoryTask = await repository.addTask(task);
         // add the same task with the same id again
         expect(repository.addTask(repositoryTask),
-            throwsA(isA<CouldNotAddTask>()));
+            throwsA(isA<CouldNotAddElement>()));
       });
 
       test('task can be added to the database', () async {
